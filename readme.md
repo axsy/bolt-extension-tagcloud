@@ -1,5 +1,4 @@
 TagCloud
 =======================
 
-This extension includes tag-cloud generation and helpers to display these clouds
-
+An extension provides capapbility of tag cloud generation and helpers to display these clouds
