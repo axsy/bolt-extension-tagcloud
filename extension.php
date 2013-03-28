@@ -114,7 +114,9 @@ namespace TagCloud\Engine
                 $cloud = $this->cache->fetch($key);
             } else {
                 $cloud = $this->builder->buildCloudFor($contentType);
-                $this->cache->save($key, $cloud);
+                if (false !== $cloud) {
+                    $this->cache->save($key, $cloud);
+                }
             }
 
             return $cloud;
@@ -189,11 +191,11 @@ namespace TagCloud\Engine
         public function buildCloudFor($contentType)
         {
             if (!isset($this->config['contenttypes'][$contentType])) {
-                throw new UnknownContentTypeException($contentType);
+                return false;
             }
 
             if (!isset($this->config['contenttypes'][$contentType]['taxonomy'])) {
-                throw new NoTaxonomiesAvailableException($contentType);
+                return false;
             }
 
             // Get first available taxonomy that behaves like tags
@@ -206,7 +208,7 @@ namespace TagCloud\Engine
                 }
             }
             if (is_null($behavesLikeTags)) {
-                throw new NoTagsTaxonomiesAvailableException($contentType);
+                return false;
             }
 
             // Get tags group
@@ -244,35 +246,39 @@ namespace TagCloud\Engine
 
         public function render($contentType, array $options)
         {
+            $html = false;
             $cloud = $this->storage->fetchCloud($contentType);
 
-            $options = array_merge_recursive($this->getDefaultOptions(), $options);
+            if (false != $cloud) {
+                $options = array_merge($this->getDefaultOptions(), $options);
 
-            if ('raw' != $options['view']) {
-                $html = '<ul';
-                if (!empty($options['list_options']) && is_array($options['list_options'])) {
-                    $html .= $this->renderOptions($options['list_options']);
+                if ('raw' != $options['view']) {
+                    $html = '<ul';
+                    if (!empty($options['list_options']) && is_array($options['list_options'])) {
+                        $html .= $this->renderOptions($options['list_options']);
+                    }
+                    $html .= '>';
+                } else {
+                    $html = null;
                 }
-                $html .= '>';
-            } else {
-                $html = null;
-            }
-            foreach ($cloud['tags'] as $tag => $rank) {
-                $link = $this->renderLink(
-                    $cloud['taxonomytype'], $tag, $rank, $options['marker'], $options['link_options']);
-                switch ($options['view']) {
-                    case 'raw':
-                        $html .= "$link ";
-                        break;
-                    case 'list':
-                        $html .= "<li>$link</li>";
-                        break;
-                    default:
-                        throw new UnsupportedViewException($options['view']);
-                        break;
+
+                foreach ($cloud['tags'] as $tag => $rank) {
+                    $link = $this->renderLink(
+                        $cloud['taxonomytype'], $tag, $rank, $options['marker'], $options['link_options']);
+                    switch ($options['view']) {
+                        case 'raw':
+                            $html .= "$link ";
+                            break;
+                        case 'list':
+                            $html .= "<li>$link</li>";
+                            break;
+                        default:
+                            throw new UnsupportedViewException($options['view']);
+                            break;
+                    }
                 }
+                $html = trim($html) . ('raw' != $options['view'] ? '</ul>' : null);
             }
-            $html = trim($html) . ('raw' != $options['view'] ? '</ul>' : null);
 
             return $html;
         }
@@ -290,10 +296,9 @@ namespace TagCloud\Engine
         private function renderOptions(array $options)
         {
             $html = null;
-            foreach($options as $key => $value) {
+            foreach ($options as $key => $value) {
                 $html .= " $key=\"" . (is_array($value) ? implode(' ', $value) : trim($value)) . '"';
             }
-            $html .= '>';
             return $html;
         }
 
@@ -392,57 +397,6 @@ namespace TagCloud\Engine
 namespace TagCloud\Engine\Exception
 {
     use TagCloud\Engine\Exception;
-
-    class NoTagsTaxonomiesAvailableException extends \RuntimeException implements Exception
-    {
-        private $contentType;
-
-        public function __construct($contentType)
-        {
-            $this->contentType = $contentType;
-
-            parent::__construct(sprintf('No taxonomies that behave like tags available for the content type \'%s\'', $contentType));
-        }
-
-        public function getContentType()
-        {
-            return $this->contentType;
-        }
-    }
-
-    class NoTaxonomiesAvailableException extends \RuntimeException implements Exception
-    {
-        private $contentType;
-
-        public function __construct($contentType)
-        {
-            $this->contentType = $contentType;
-
-            parent::__construct(sprintf('No taxonomies available for the content type \'%s\'', $contentType));
-        }
-
-        public function getContentType()
-        {
-            return $this->contentType;
-        }
-    }
-
-    class UnknownContentTypeException extends \RuntimeException implements Exception
-    {
-        private $contentType;
-
-        public function __construct($contentType)
-        {
-            $this->contentType = $contentType;
-
-            parent::__construct(sprintf('Unknown content type \'%s\'', $contentType));
-        }
-
-        public function getContentType()
-        {
-            return $this->contentType;
-        }
-    }
 
     class UnsupportedViewException extends \RuntimeException implements Exception
     {
