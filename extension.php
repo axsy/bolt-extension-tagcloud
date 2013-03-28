@@ -4,6 +4,10 @@ namespace TagCloud;
 
 use Bolt\BaseExtension;
 
+use TagCloud\Provider\TagCloudServiceProvider;
+
+require_once __DIR__ . '/Provider/TagCloudServiceProvider.php';
+
 class Extension extends BaseExtension
 {
     /**
@@ -28,6 +32,11 @@ class Extension extends BaseExtension
         );
 
         return $data;
+    }
+
+    function initialize()
+    {
+       $this->app->register(new TagCloudServiceProvider());
     }
 }
 
