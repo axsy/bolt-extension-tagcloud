@@ -71,7 +71,7 @@ namespace TagCloud\Provider
                 $app['tagcloud.storage']->deleteCloud($event->getContent()->contenttype['slug']);
             });
 
-            $app['twig']->addExtension(new TwigExtension($app['tagcloud.view']));
+            $app['twig']->addExtension(new TwigExtension($app['tagcloud.builder'], $app['tagcloud.view']));
         }
 
         public function boot(Application $app)
@@ -190,29 +190,12 @@ namespace TagCloud\Engine
 
         public function buildCloudFor($contentType)
         {
-            if (!isset($this->config['contenttypes'][$contentType])) {
-                return false;
-            }
-
-            if (!isset($this->config['contenttypes'][$contentType]['taxonomy'])) {
-                return false;
-            }
-
-            // Get first available taxonomy that behaves like tags
-            // TODO: Research, what if content type has several taxonomies which behave like tags? Is it possible?
-            $behavesLikeTags = null;
-            foreach ($this->config['contenttypes'][$contentType]['taxonomy'] as $taxonomy) {
-                if ('tags' == $this->config['taxonomy'][$taxonomy]['behaves_like']) {
-                    $behavesLikeTags = $taxonomy;
-                    break;
-                }
-            }
-            if (is_null($behavesLikeTags)) {
+            if (false === ($tagsTaxonomy = $this->canBuildCloudFor($contentType))) {
                 return false;
             }
 
             // Get tags group
-            $tags = $this->repository->getTaxonomyGroupFor($contentType, $behavesLikeTags);
+            $tags = $this->repository->getTaxonomyGroupFor($contentType, $tagsTaxonomy);
 
             // Normalize tags group
             if (!empty($tags)) {
@@ -223,9 +206,35 @@ namespace TagCloud\Engine
             }
 
             return array(
-                'taxonomytype' => $behavesLikeTags,
+                'taxonomytype' => $tagsTaxonomy,
                 'tags' => $tags
             );
+        }
+
+        public function getTagsTaxonomy($contentType)
+        {
+            if (!isset($this->config['contenttypes'][$contentType])) {
+                return false;
+            }
+
+            if (!isset($this->config['contenttypes'][$contentType]['taxonomy'])) {
+                return false;
+            }
+
+            // Get first available taxonomy that behaves like tags
+            // TODO: Research, what if content type has several taxonomies which behave like tags? Is it possible?
+            $tagsTaxonomy = null;
+            foreach ($this->config['contenttypes'][$contentType]['taxonomy'] as $taxonomy) {
+                if ('tags' == $this->config['taxonomy'][$taxonomy]['behaves_like']) {
+                    $tagsTaxonomy = $taxonomy;
+                    break;
+                }
+            }
+            if (is_null($tagsTaxonomy)) {
+                return false;
+            }
+
+            return $tagsTaxonomy;
         }
 
         protected function normalize($rank, $maxRank)
@@ -321,19 +330,22 @@ namespace TagCloud\Engine
 
     class TwigExtension extends \Twig_Extension
     {
+        protected $builder;
         protected $view;
 
-        public function __construct(View $view)
+        public function __construct(Builder $builder, View $view)
         {
+            $this->builder = $builder;
             $this->view = $view;
         }
 
         public function getFunctions()
         {
             return array(
+                new \Twig_SimpleFunction('has_tag_cloud', array($this, 'hasTagCloud')),
                 new \Twig_SimpleFunction('tag_cloud', array($this, 'render'), array('is_safe' => array('html'))),
                 new \Twig_SimpleFunction('tag_cloud_raw', array($this, 'renderRaw'), array('is_safe' => array('html'))),
-                new \Twig_SimpleFunction('tag_cloud_list', array($this, 'renderList'), array('is_safe' => array('html'))),
+                new \Twig_SimpleFunction('tag_cloud_list', array($this, 'renderList'), array('is_safe' => array('html')))
             );
         }
 
@@ -342,6 +354,11 @@ namespace TagCloud\Engine
             return array(
                 new \Twig_SimpleFilter('contenttype', array($this, 'getContentType'))
             );
+        }
+
+        public function hasTagCloud($contentType)
+        {
+            return false !== $this->builder->getTagsTaxonomy($contentType);
         }
 
         public function getContentType($content)
