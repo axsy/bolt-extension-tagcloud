@@ -42,7 +42,7 @@ namespace TagCloud\Provider
 {
     use Silex\Application;
     use Silex\ServiceProviderInterface;
-    use TagCloud\Common\ConfigurationReader;
+    use Axsy\Common\ConfigurationReader;
     use TagCloud\Engine\Builder;
     use TagCloud\Engine\Configuration;
     use TagCloud\Engine\Repository;
@@ -81,43 +81,6 @@ namespace TagCloud\Provider
 
         public function boot(Application $app)
         {
-        }
-    }
-}
-
-namespace TagCloud\Common
-{
-    use Symfony\Component\Config\ConfigCache;
-    use Symfony\Component\Config\Definition\ConfigurationInterface;
-    use Symfony\Component\Config\Definition\Processor;
-    use Symfony\Component\Config\Resource\FileResource;
-    use Symfony\Component\Yaml\Yaml;
-
-    class ConfigurationReader
-    {
-        protected $cachePath;
-        protected $debug;
-
-        public function __construct($cachePath, $debug)
-        {
-            $this->cachePath = $cachePath;
-            $this->debug = (bool)$debug;
-        }
-
-        public function read(ConfigurationInterface $configuration, $configPath)
-        {
-            $cacheFile = $this->cachePath . '/extensions/' . pathinfo(dirname(__FILE__), PATHINFO_FILENAME) . '_config.php';
-            $cache = new ConfigCache($cacheFile, $this->debug);
-
-            if (!$cache->isFresh()) {
-                $processor = new Processor();
-                $config = $processor->processConfiguration($configuration, Yaml::parse($configPath));
-
-                $code = sprintf('<?php return unserialize(\'%s\');', serialize($config));
-                $cache->write($code, array(new FileResource($configPath)));
-            }
-
-            return require_once $cacheFile;
         }
     }
 }
@@ -494,6 +457,43 @@ namespace TagCloud\Engine\Exception
         public function getView()
         {
             return $this->view;
+        }
+    }
+}
+
+namespace Axsy\Common
+{
+    use Symfony\Component\Config\ConfigCache;
+    use Symfony\Component\Config\Definition\ConfigurationInterface;
+    use Symfony\Component\Config\Definition\Processor;
+    use Symfony\Component\Config\Resource\FileResource;
+    use Symfony\Component\Yaml\Yaml;
+
+    class ConfigurationReader
+    {
+        protected $cachePath;
+        protected $debug;
+
+        public function __construct($cachePath, $debug)
+        {
+            $this->cachePath = $cachePath;
+            $this->debug = (bool)$debug;
+        }
+
+        public function read(ConfigurationInterface $configuration, $configPath)
+        {
+            $cacheFile = $this->cachePath . '/extensions/' . pathinfo(dirname(__FILE__), PATHINFO_FILENAME) . '_config.php';
+            $cache = new ConfigCache($cacheFile, $this->debug);
+
+            if (!$cache->isFresh()) {
+                $processor = new Processor();
+                $config = $processor->processConfiguration($configuration, Yaml::parse($configPath));
+
+                $code = sprintf('<?php return unserialize(\'%s\');', serialize($config));
+                $cache->write($code, array(new FileResource($configPath)));
+            }
+
+            return require_once $cacheFile;
         }
     }
 }
