@@ -386,7 +386,7 @@ namespace TagCloud\Engine
             return $this->render($contentType, $options);
         }
 
-        public function renderList($contentType, $listOptions = null, $linkOptions = null, $marker = null)
+        public function renderList($contentType, $linkOptions = null, $marker = null, $listOptions = null)
         {
             $options = array(
                 'view' => 'list'
