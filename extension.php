@@ -14,7 +14,7 @@ namespace TagCloud
         {
             $data = array(
                 'name' => "TagCloud",
-                'description' => "An extension provides capapbility of tag cloud generation and helpers to display these clouds",
+                'description' => "An extension provides capability of tag cloud generation and helpers to display these clouds",
                 'keywords' => "bolt, extension, tagcloud",
                 'author' => "Aleksey Orlov",
                 'link' => "https://github.com/axsy/bolt-extension-tagcloud",
@@ -42,7 +42,9 @@ namespace TagCloud\Provider
 {
     use Silex\Application;
     use Silex\ServiceProviderInterface;
+    use TagCloud\Common\ConfigurationReader;
     use TagCloud\Engine\Builder;
+    use TagCloud\Engine\Configuration;
     use TagCloud\Engine\Repository;
     use TagCloud\Engine\Storage;
     use TagCloud\Engine\TwigExtension;
@@ -54,11 +56,14 @@ namespace TagCloud\Provider
     {
         public function register(Application $app)
         {
+            $configReader = new ConfigurationReader($app['paths']['apppath'] . '/cache', $app['debug']);
+            $app['tagcloud.config'] = $configReader->read(new Configuration(), dirname(__FILE__) . '/config.yml');
+
             $app['tagcloud.repository'] = $app->share(function ($app) {
                 return new Repository($app['db']);
             });
             $app['tagcloud.builder'] = $app->share(function ($app) {
-                return new Builder($app['config'], $app['tagcloud.repository']);
+                return new Builder($app['tagcloud.repository'], $app['tagcloud.config'], $app['config']);
             });
             $app['tagcloud.storage'] = $app->share(function ($app) {
                 return new Storage($app['tagcloud.builder'], $app['cache']);
@@ -80,8 +85,47 @@ namespace TagCloud\Provider
     }
 }
 
+namespace TagCloud\Common
+{
+    use Symfony\Component\Config\ConfigCache;
+    use Symfony\Component\Config\Definition\ConfigurationInterface;
+    use Symfony\Component\Config\Definition\Processor;
+    use Symfony\Component\Config\Resource\FileResource;
+    use Symfony\Component\Yaml\Yaml;
+
+    class ConfigurationReader
+    {
+        protected $cachePath;
+        protected $debug;
+
+        public function __construct($cachePath, $debug)
+        {
+            $this->cachePath = $cachePath;
+            $this->debug = (bool)$debug;
+        }
+
+        public function read(ConfigurationInterface $configuration, $configPath)
+        {
+            $cacheFile = $this->cachePath . '/extensions/' . pathinfo(dirname(__FILE__), PATHINFO_FILENAME) . '_config.php';
+            $cache = new ConfigCache($cacheFile, $this->debug);
+
+            if (!$cache->isFresh()) {
+                $processor = new Processor();
+                $config = $processor->processConfiguration($configuration, Yaml::parse($configPath));
+
+                $code = sprintf('<?php return unserialize(\'%s\');', serialize($config));
+                $cache->write($code, array(new FileResource($configPath)));
+            }
+
+            return require_once $cacheFile;
+        }
+    }
+}
+
 namespace TagCloud\Engine
 {
+    use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+    use Symfony\Component\Config\Definition\ConfigurationInterface;
     use TagCloud\Engine\Exception\NoTagsTaxonomiesAvailableException;
     use TagCloud\Engine\Exception\NoTaxonomiesAvailableException;
     use TagCloud\Engine\Exception\UnknownContentTypeException;
@@ -93,6 +137,25 @@ namespace TagCloud\Engine
 
     interface Exception
     {
+    }
+
+    class Configuration implements ConfigurationInterface
+    {
+        public function getConfigTreeBuilder()
+        {
+            $treeBuilder = new TreeBuilder();
+            $rootNode = $treeBuilder->root('tag_cloud');
+
+            $rootNode
+                ->children()
+                    ->integerNode('size')
+                        ->min(1)
+                    ->end()
+                ->end()
+            ;
+
+            return $treeBuilder;
+        }
     }
 
     class Storage
@@ -148,7 +211,7 @@ namespace TagCloud\Engine
             $this->conn = $conn;
         }
 
-        public function getTaxonomyGroupFor($contentType, $taxonomyType)
+        public function getTaxonomyGroupFor($contentType, $taxonomyType, $size)
         {
             $stmt = $this
                 ->conn
@@ -163,6 +226,7 @@ namespace TagCloud\Engine
                     ':taxonomyType' => $taxonomyType,
                     ':contentType' => $contentType
                 ))
+                ->setMaxResults($size)
                 ->execute();
 
             $tags = array();
@@ -182,20 +246,21 @@ namespace TagCloud\Engine
         protected $config;
         protected $repository;
 
-        public function __construct(array $config, Repository $repository)
+        public function __construct(Repository $repository, array $cloudConfig, array $appConfig)
         {
-            $this->config = $config;
+            $this->cloudConfig = $cloudConfig;
+            $this->appConfig = $appConfig;
             $this->repository = $repository;
         }
 
         public function buildCloudFor($contentType)
         {
-            if (false === ($tagsTaxonomy = $this->canBuildCloudFor($contentType))) {
+            if (false === ($tagsTaxonomy = $this->getTagsTaxonomy($contentType))) {
                 return false;
             }
 
             // Get tags group
-            $tags = $this->repository->getTaxonomyGroupFor($contentType, $tagsTaxonomy);
+            $tags = $this->repository->getTaxonomyGroupFor($contentType, $tagsTaxonomy, $this->cloudConfig['size']);
 
             // Normalize tags group
             if (!empty($tags)) {
@@ -213,19 +278,19 @@ namespace TagCloud\Engine
 
         public function getTagsTaxonomy($contentType)
         {
-            if (!isset($this->config['contenttypes'][$contentType])) {
+            if (!isset($this->appConfig['contenttypes'][$contentType])) {
                 return false;
             }
 
-            if (!isset($this->config['contenttypes'][$contentType]['taxonomy'])) {
+            if (!isset($this->appConfig['contenttypes'][$contentType]['taxonomy'])) {
                 return false;
             }
 
             // Get first available taxonomy that behaves like tags
             // TODO: Research, what if content type has several taxonomies which behave like tags? Is it possible?
             $tagsTaxonomy = null;
-            foreach ($this->config['contenttypes'][$contentType]['taxonomy'] as $taxonomy) {
-                if ('tags' == $this->config['taxonomy'][$taxonomy]['behaves_like']) {
+            foreach ($this->appConfig['contenttypes'][$contentType]['taxonomy'] as $taxonomy) {
+                if ('tags' == $this->appConfig['taxonomy'][$taxonomy]['behaves_like']) {
                     $tagsTaxonomy = $taxonomy;
                     break;
                 }
