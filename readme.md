@@ -151,7 +151,7 @@ Outputs:
 Realworld usage scenario
 ------------------------
 
-Generally speaking Bolt provides record pages or records list pages. Probably, you've decided to use] classic page markup
+Generally speaking Bolt provides record pages or records list pages. Probably, you've decided to use classic page markup
 for your own theme with single aside for the all types of pages. Assume this aside
 should have the tag cloud related to the record(s) that is/are being shown. Also assume that you have two different content
 types and only one of them have taxonomy that behaves like tags. This way we can't calculate cloud tags and therefore can't
@@ -186,7 +186,7 @@ listing.twig:
         {{ pager() }}
     {% endblock content %}
 
-Then we just out tag cloud in the aside but previously check does this content type support tag clouds? This can be done
+Then we just output tag cloud in the aside but previously check does this content type support tag clouds? This can be done
 via `has_tag_cloud()` helper:
 
 aside.twig:
