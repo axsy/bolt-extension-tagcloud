@@ -52,15 +52,19 @@ These produces the following markup:
 Default cloud markup can be highly customized via the following rendering options:
 
 *   view
+
     Can be equal to "list"(by default) or "raw". In case of "raw" value
     the tag cloud will be rendered just like hyperlinks divided by spaces.
 *   marker
+
     Defines template for the marker class of the tag cloud hyperlinks ("tag-{rank}" by default). Can be overriden
     with your custom template where is a "{rank}" substring. Rank are values from 1 up to 5.
 *   list_options
+
     An array with classes and/or attributes to be set on the '<ul>' tag (makes sence only with view option set to
     "list".
 *   link_options
+
     An array with classes and/or attributes to be set on the '<a>' tags of the tag cloud
 
 
@@ -207,16 +211,21 @@ in simple and usual way, by overriding the defined services or by use only some 
 
 The following services are defined:
 
-    *   tagcloud.config
-        Not a service but just an extension configuration in the form of the associative array
-    *   tagcloud.repository
-        Talks to the database to get a data necessary to build a tag cloud
-    *   tagcloud.builder
-        Builds tag clouds
-    *   tagcloud.storage
-        Controls tag clouds cache
-    *   tagcloud.view
-        Renders previously calculated tag cloud
+*   tagcloud.config
+
+    Not a service but just an extension configuration in the form of the associative array
+*   tagcloud.repository
+
+    Talks to the database to get a data necessary to build a tag cloud
+*   tagcloud.builder
+
+    Builds tag clouds
+*   tagcloud.storage
+
+    Controls tag clouds cache
+*   tagcloud.view
+
+    Renders previously calculated tag cloud
 
 Please look to the extension code to find out how they're working. In case you want to replace (or override) some of them
 in the whole tag clouds engine you can replace the service with an extended or reimplemented class, please look to the
