@@ -49,7 +49,7 @@ These produces the following markup:
         </li>
     </ul>
 
-Default cloud markup can be highly customized via the following rendering options:
+Default cloud markup can be customized via the following rendering options:
 
 *   view
 
@@ -58,7 +58,7 @@ Default cloud markup can be highly customized via the following rendering option
 *   marker
 
     Defines template for the marker class of the tag cloud hyperlinks ("tag-{rank}" by default). Can be overriden
-    with your custom template where is a "{rank}" substring. Rank are values from 1 up to 5.
+    with your custom template where is a "{rank}" substring. Rank are values from 1 to 5.
 *   list_options
 
     An array with classes and/or attributes to be set on the `<ul>` tag (makes sense only with view option set to
