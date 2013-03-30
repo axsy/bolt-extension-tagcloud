@@ -240,6 +240,6 @@ Todo List
 ---------
 
 *   Add support for the tag boost in order to make some tags always shown in the tag cloud
-*   Probably add tags sorting
+*   Probably add tags sorting possibility
 *   Add service to make it simple to generate 'Tags' sections on the site (just like 'Archive', 'Categories' etc.)
 *   Research, what if content type has several taxonomies which behave like tags? Is it possible?
