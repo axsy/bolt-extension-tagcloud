@@ -239,8 +239,6 @@ following interfaces:
 Todo List
 ---------
 
-*   Make sure taxonomy table has all necessary indexes. Probably via some console schema updater but I think
-    I need to talk with Bolt core developers... Should be researched first.
 *   Add support for the tag boost in order to make some tags always shown in the tag cloud
 *   Probably add tags sorting
 *   Add service to make it simple to generate 'Tags' sections on the site (just like 'Archive', 'Categories' etc.)
