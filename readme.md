@@ -61,11 +61,11 @@ Default cloud markup can be highly customized via the following rendering option
     with your custom template where is a "{rank}" substring. Rank are values from 1 up to 5.
 *   list_options
 
-    An array with classes and/or attributes to be set on the '<ul>' tag (makes sence only with view option set to
+    An array with classes and/or attributes to be set on the "<ul>" tag (makes sence only with view option set to
     "list".
 *   link_options
 
-    An array with classes and/or attributes to be set on the '<a>' tags of the tag cloud
+    An array with classes and/or attributes to be set on the "<a>" tags of the tag cloud
 
 
 Two shortcuts are available:
