@@ -4,7 +4,7 @@ TagCloud
 An extension provides capability of tag cloud generation and helpers to display these clouds. You can read more about
 awesome Bolt CMS built on top of Silex microframework at [Bolt.cm](http://bolt.cm).
 
-The tag clouds rendering is extremely fast becouse they're being calculated only once for the specified content type
+The tag clouds rendering is extremely fast because they're being calculated only once for the specified content type
 and will be invalidated on the cache clear or some changes in the list of records of single content type. The configuration
 is also being cached using Symfony's Config component.
 
@@ -61,7 +61,7 @@ Default cloud markup can be highly customized via the following rendering option
     with your custom template where is a "{rank}" substring. Rank are values from 1 up to 5.
 *   list_options
 
-    An array with classes and/or attributes to be set on the `<ul>` tag (makes sence only with view option set to
+    An array with classes and/or attributes to be set on the `<ul>` tag (makes sense only with view option set to
     "list".
 *   link_options
 
@@ -205,7 +205,7 @@ Extensibility
 -------------
 
 Well, the goal of this extension was not to provide a huge list of options, helpers etc. to customize the tag clouds are
-being produced, but allow to make an engine simply extendeable with your own specific requirements and customizations.
+being produced, but allow to make an engine simply extendable with your own specific requirements and customizations.
 Would you like to completely change the rendering way, normalization algorithm, etc.? Thanks to Silex this can be done
 in simple and usual way, by overriding the defined services or by use only some of them independently.
 
