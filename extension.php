@@ -214,7 +214,6 @@ namespace TagCloud\Engine
                     ':taxonomyType' => $taxonomyType,
                     ':contentType' => $contentType
                 ))
-                ->orderBy('count')
                 ->setMaxResults($cloudSize)
                 ->execute();
 
