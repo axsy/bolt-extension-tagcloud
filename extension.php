@@ -102,6 +102,30 @@ namespace TagCloud\Engine
     {
     }
 
+    interface StorageInterface
+    {
+        public function fetchCloud($contentType);
+
+        public function deleteCloud($contentType);
+    }
+
+    interface RepositoryInterface
+    {
+        public function getTaxonomyGroupFor($contentType, $taxonomyType, $cloudSize);
+    }
+
+    interface BuilderInterface
+    {
+        public function buildCloudFor($contentType);
+
+        public function getTagsTaxonomy($contentType);
+    }
+
+    interface ViewInterface
+    {
+        public function render($contentType, array $options)
+    }
+
     class Configuration implements ConfigurationInterface
     {
         public function getConfigTreeBuilder()
@@ -121,7 +145,7 @@ namespace TagCloud\Engine
         }
     }
 
-    class Storage
+    class Storage implements StorageInterface
     {
         protected $cache;
 
@@ -162,7 +186,7 @@ namespace TagCloud\Engine
         }
     }
 
-    class Repository
+    class Repository implements RepositoryInterface
     {
         /**
          * @var \Doctrine\DBAL\Connection
@@ -174,7 +198,7 @@ namespace TagCloud\Engine
             $this->conn = $conn;
         }
 
-        public function getTaxonomyGroupFor($contentType, $taxonomyType, $size)
+        public function getTaxonomyGroupFor($contentType, $taxonomyType, $cloudSize)
         {
             $stmt = $this
                 ->conn
@@ -189,7 +213,7 @@ namespace TagCloud\Engine
                     ':taxonomyType' => $taxonomyType,
                     ':contentType' => $contentType
                 ))
-                ->setMaxResults($size)
+                ->setMaxResults($cloudSize)
                 ->execute();
 
             $tags = array();
@@ -201,7 +225,7 @@ namespace TagCloud\Engine
         }
     }
 
-    class Builder
+    class Builder extends BuilderInterface
     {
         /**
          * @var array
@@ -271,7 +295,7 @@ namespace TagCloud\Engine
         }
     }
 
-    class View
+    class View extends ViewInterface
     {
         protected $storage;
 

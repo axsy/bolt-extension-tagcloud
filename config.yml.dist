@@ -1,4 +1,4 @@
 # Configuration file for TagCloud
 
 tagcloud:
-    size: 5
+    size: 15
