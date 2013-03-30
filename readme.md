@@ -204,8 +204,7 @@ We can safely omit the usage of has_tag_cloud(). This case all rendering functio
 Extensibility
 -------------
 
-Well, the goal of this extension is not to provide a huge list of options, helpers etc. to customize the tag clouds are
-being produced, but allow to make an engine simply extendable with your own specific requirements and customizations.
+The extension allows an engine to be simply extendable with your own specific requirements and customizations.
 Would you like to completely change the rendering way, normalization algorithm, etc.? Thanks to Silex this can be done
 in simple and usual way, by overriding the defined services or by use only some of them independently.
 
