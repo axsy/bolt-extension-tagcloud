@@ -4,14 +4,14 @@ TagCloud
 An extension provides capability of tag cloud generation and helpers to display these clouds. You can read more about
 awesome Bolt CMS built on top of Silex microframework at [Bolt.cm](http://bolt.cm).
 
-The tag clouds rendering are extremely fast becouse they're being calculated only once for the specified content type
+The tag clouds rendering is extremely fast becouse they're being calculated only once for the specified content type
 and will be invalidated on the cache clear or some changes in the list of records of single content type. The configuration
 is also being cached using Symfony's Config component.
 
 Usage
 -----
 
-Is as simple as add the following lines to the code:
+Is as simple as add the following line to the code:
 
     {{ tag_cloud(record|contenttype) }}
 
@@ -21,7 +21,7 @@ or
 
 The general notation is
 
-    {{ tag_cloud(contenttype{, {<options>}}) }}
+    {{ tag_cloud(contenttype[, {<options>}]) }}
 
 These produces the following markup:
 
@@ -51,17 +51,17 @@ These produces the following markup:
 
 Default cloud markup can be highly customized via the following rendering options:
 
-    *   view
-        Can be equal to "list"(by default) or "raw". In case of "raw" value
-        the tag cloud will be rendered just like hyperlinks divided by spaces.
-    *   marker
-        Defines template for the marker class of the tag cloud hyperlinks ("tag-{rank}" by default). Can be overriden
-        with vour custom template where is "{rank}" substring. Rank are values from 1 up pto 5.
-    *   list_options
-        An array with classes and/or attributes to be set on the '<ul>' tag (makes sence only with view options set to
-        "list".
-    *   link_options
-        An array with classes and/or attributes to be set on the '<a>' tags of the tag cloud
+*   view
+    Can be equal to "list"(by default) or "raw". In case of "raw" value
+    the tag cloud will be rendered just like hyperlinks divided by spaces.
+*   marker
+    Defines template for the marker class of the tag cloud hyperlinks ("tag-{rank}" by default). Can be overriden
+    with your custom template where is a "{rank}" substring. Rank are values from 1 up to 5.
+*   list_options
+    An array with classes and/or attributes to be set on the '<ul>' tag (makes sence only with view option set to
+    "list".
+*   link_options
+    An array with classes and/or attributes to be set on the '<a>' tags of the tag cloud
 
 
 Two shortcuts are available:
@@ -89,6 +89,8 @@ Render raw tag-cloud with customized marker class and some custom classes added:
 
     {{ tag_cloud(contenttype, {view: "raw", marker: "rank-{rank}", link_options:{class: "tag pretty"}}) }}
 
+Outputs:
+
     <a href="/tags/annotations" class="tag pretty rank-1">annotations</a>
     <a href="/tags/aop" class="tag pretty rank-3">aop</a>
     <a href="/tags/demo" class="tag pretty rank-1">demo</a>
@@ -101,6 +103,8 @@ Render the same hyperlinks but as the customized list:
 
     {{ tag_cloud(contenttype, {view: "list", marker: "rank-{rank}",
        link_options: {class: "tag pretty"}, list_options: {id: "cloud"}}) }}
+
+Outputs:
 
     <ul id="cloud">
         <li>
@@ -126,9 +130,11 @@ Render the same hyperlinks but as the customized list:
         </li>
     </ul>
 
-Render simple lightly cusatomized raw tag cloud:
+Render simple slightly customized raw tag cloud:
 
     {{ tag_cloud_raw(contenttype, {class: "tag"}) }}
+
+Outputs:
 
     <a href="/tags/annotations" class="tag tag-1">annotations</a>
     <a href="/tags/aop" class="tag tag-3">aop</a>
@@ -141,11 +147,11 @@ Render simple lightly cusatomized raw tag cloud:
 Realworld usage scenario
 ------------------------
 
-Generally speaking Bolt provides record pages or records list pages. Probably, you've decided to use template inheritance
-for your own theme and choosed classic page markup with single aside for the all types of pages. Assume this aside
+Generally speaking Bolt provides record pages or records list pages. Probably, you've decided to use] classic page markup
+for your own theme with single aside for the all types of pages. Assume this aside
 should have the tag cloud related to the record(s) that is/are being shown. Also assume that you have two different content
 types and only one of them have taxonomy that behaves like tags. This way we can't calculate cloud tags and therefore can't
-show it for the content types which don't support them. For the simplicity lets also assume that we have only two template
+show it for the content types which don't support them. Also, for the simplicity lets assume that we have only two template
 pages, record.twig and listing.twig
 
 Since tag cloud are being shown based on the content type we have to determine current content type and pass it to the
@@ -189,12 +195,14 @@ aside.twig:
         </section>
     {% endif %}
 
+We can safely omit the usage of has_tag_cloud(). This case all rendering functions will return an empty string.
+
 Extensibility
 -------------
 
-Well, the goal of it's extension was not to provide a huge list of options, helpers etc. to customize the tag clouds are
-being produced, but allow to make an engine simply extended with your own specific requirements and customization.
-Would you like to completely change the rendering way, noirmalization alorithm, etc.? Thanks to Silex this can be done
+Well, the goal of this extension was not to provide a huge list of options, helpers etc. to customize the tag clouds are
+being produced, but allow to make an engine simply extendeable with your own specific requirements and customizations.
+Would you like to completely change the rendering way, normalization algorithm, etc.? Thanks to Silex this can be done
 in simple and usual way, by overriding the defined services or by use only some of them independently.
 
 The following services are defined:
@@ -210,19 +218,21 @@ The following services are defined:
     *   tagcloud.view
         Renders previously calculated tag cloud
 
-Please look to the extension code to find out how they're work. In case you want to replace (or override) some of them
-in the chain you can replace the service with an extended or reimplemented class, please look to the following interfaces:
+Please look to the extension code to find out how they're working. In case you want to replace (or override) some of them
+in the whole tag clouds engine you can replace the service with an extended or reimplemented class, please look to the
+following interfaces:
 
-    *   StorageInterface
-    *   RepositoryInterface
-    *   BuilderInterface
-    *   ViewInterface
+*   StorageInterface
+*   RepositoryInterface
+*   BuilderInterface
+*   ViewInterface
 
 Todo List
 ---------
 
-    *   Make sure taxonomy table has all necessary indexes. Probably via some console schema updater but I think
-        I need to talk with Bolt core developers first...
-    *   Add support for the tag boost in order to make some tags always shown in the tag cloud
-    *   Probably add tags sorting
-    *   Add service to make it simple generate 'Tags' sections on the site (just like 'Archive', 'Categories' etc.)
+*   Make sure taxonomy table has all necessary indexes. Probably via some console schema updater but I think
+    I need to talk with Bolt core developers... Should be researched first.
+*   Add support for the tag boost in order to make some tags always shown in the tag cloud
+*   Probably add tags sorting
+*   Add service to make it simple to generate 'Tags' sections on the site (just like 'Archive', 'Categories' etc.)
+*   Research, what if content type has several taxonomies which behave like tags? Is it possible?

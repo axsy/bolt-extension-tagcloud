@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * (c) Aleksey Orlov <i.trancer@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace TagCloud
 {
     use Bolt\BaseExtension;
@@ -7,9 +14,6 @@ namespace TagCloud
 
     class Extension extends BaseExtension
     {
-        /**
-         * Info block for TagCloud Extension.
-         */
         function info()
         {
             $data = array(
@@ -188,9 +192,6 @@ namespace TagCloud\Engine
 
     class Repository implements RepositoryInterface
     {
-        /**
-         * @var \Doctrine\DBAL\Connection
-         */
         protected $conn;
 
         public function __construct(Connection $conn)
@@ -228,9 +229,6 @@ namespace TagCloud\Engine
 
     class Builder implements BuilderInterface
     {
-        /**
-         * @var array
-         */
         protected $config;
         protected $repository;
 
@@ -247,10 +245,8 @@ namespace TagCloud\Engine
                 return false;
             }
 
-            // Get tags group
             $tags = $this->repository->getTaxonomyGroupFor($contentType, $tagsTaxonomy, $this->cloudConfig['size']);
 
-            // Normalize tags group
             if (!empty($tags)) {
                 $maxRank = max($tags);
                 foreach ($tags as &$rank) {
