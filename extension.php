@@ -123,7 +123,7 @@ namespace TagCloud\Engine
 
     interface ViewInterface
     {
-        public function render($contentType, array $options)
+        public function render($contentType, array $options = array());
     }
 
     class Configuration implements ConfigurationInterface
@@ -225,7 +225,7 @@ namespace TagCloud\Engine
         }
     }
 
-    class Builder extends BuilderInterface
+    class Builder implements BuilderInterface
     {
         /**
          * @var array
@@ -295,7 +295,7 @@ namespace TagCloud\Engine
         }
     }
 
-    class View extends ViewInterface
+    class View implements ViewInterface
     {
         protected $storage;
 
@@ -305,7 +305,7 @@ namespace TagCloud\Engine
             $this->baseUrl = $baseUrl;
         }
 
-        public function render($contentType, array $options)
+        public function render($contentType, array $options = array())
         {
             $html = false;
             $cloud = $this->storage->fetchCloud($contentType);
