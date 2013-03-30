@@ -213,6 +213,7 @@ namespace TagCloud\Engine
                     ':taxonomyType' => $taxonomyType,
                     ':contentType' => $contentType
                 ))
+                ->orderBy('count')
                 ->setMaxResults($cloudSize)
                 ->execute();
 
@@ -418,12 +419,12 @@ namespace TagCloud\Engine
             return $content instanceof Content ? $content->contenttype['slug'] : false;
         }
 
-        public function render($contentType, array $options = null)
+        public function render($contentType, array $options = array())
         {
             return $this->view->render($contentType, $options);
         }
 
-        public function renderRaw($contentType, $linkOptions = null, $marker = null)
+        public function renderRaw($contentType, $linkOptions = array(), $marker = null)
         {
             $options = array(
                 'view' => 'raw'
@@ -438,7 +439,7 @@ namespace TagCloud\Engine
             return $this->render($contentType, $options);
         }
 
-        public function renderList($contentType, $linkOptions = null, $marker = null, $listOptions = null)
+        public function renderList($contentType, $linkOptions = array(), $marker = null, $listOptions = array())
         {
             $options = array(
                 'view' => 'list'
