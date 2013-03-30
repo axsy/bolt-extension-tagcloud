@@ -4,7 +4,7 @@ TagCloud
 An extension provides capability of tag cloud generation and helpers to display these clouds. You can read more about
 awesome Bolt CMS built on top of Silex microframework at [Bolt.cm](http://bolt.cm).
 
-The tag clouds rendering is extremely fast because they're being calculated only once for the specified content type
+The tag clouds are being rendered extremely fast because they're being calculated only once for the specified content type
 and will be invalidated on the cache clear or some changes in the list of records of single content type. The configuration
 is also being cached using Symfony's Config component.
 
