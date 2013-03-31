@@ -193,9 +193,11 @@ aside.twig:
 
     {% if has_tag_cloud(contenttype) %}
         <section>
-            <h1>Tags
-            {# We can use there whatever rendering function we like, with any set of options #}
-            {{ tag_cloud_list(contenttype, {class: "tag"}) }}
+            <h1>Tags</h1>
+            <nav>
+                {# We can use there whatever rendering function we like, with any set of options #}
+                {{ tag_cloud_list(contenttype, {class: "tag"}) }}
+            </nav>
         </section>
     {% endif %}
 
