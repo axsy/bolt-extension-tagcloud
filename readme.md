@@ -201,7 +201,8 @@ aside.twig:
         </section>
     {% endif %}
 
-We can safely omit the usage of `has_tag_cloud()`. This case all rendering functions will return an empty string.
+We can safely omit the usage of `has_tag_cloud()`. This case all rendering functions will return an empty string for the
+unsupported content types.
 
 Extensibility
 -------------
