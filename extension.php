@@ -287,7 +287,7 @@ namespace TagCloud\Engine
 
         protected function normalize($rank, $maxRank)
         {
-            return round(1 + ($rank - 1) * 4 / ($maxRank - 1));
+            return $maxRank > 1 ? round(1 + ($rank - 1) * 4 / ($maxRank - 1)) : 1;
         }
     }
 
