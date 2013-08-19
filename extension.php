@@ -24,10 +24,10 @@ namespace TagCloud
                 'link' => "https://github.com/axsy/bolt-extension-tagcloud",
                 'version' => "0.1",
                 'required_bolt_version' => "1.0.3",
-                'highest_bolt_version' => "1.0.3",
+                'highest_bolt_version' => "1.1.4",
                 'type' => "General",
                 'first_releasedate' => "2013-03-27",
-                'latest_releasedate' => "2013-03-27",
+                'latest_releasedate' => "2013-08-19",
                 'dependencies' => "",
                 'priority' => 10
             );
@@ -231,7 +231,7 @@ namespace TagCloud\Engine
         protected $config;
         protected $repository;
 
-        public function __construct(Repository $repository, array $cloudConfig, array $appConfig)
+        public function __construct(Repository $repository, array $cloudConfig, $appConfig)
         {
             $this->cloudConfig = $cloudConfig;
             $this->appConfig = $appConfig;
