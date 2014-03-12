@@ -10,6 +10,7 @@
 namespace TagCloud
 {
     use Bolt\BaseExtension;
+    use Bolt\StorageEvents;
     use TagCloud\Provider\TagCloudServiceProvider;
 
     class Extension extends BaseExtension
@@ -76,7 +77,7 @@ namespace TagCloud\Provider
                 return new View($app['tagcloud.storage'], $app['paths']['root']);
             });
 
-            $app['dispatcher']->addListener(StorageEvents::postSave, function (StorageEvent $event) use ($app) {
+            $app['dispatcher']->addListener(StorageEvents::POST_SAVE, function (StorageEvent $event) use ($app) {
                 $app['tagcloud.storage']->deleteCloud($event->getContent()->contenttype['slug']);
             });
 
