@@ -262,19 +262,19 @@ namespace TagCloud\Engine
 
         public function getTagsTaxonomy($contentType)
         {
-            if (!isset($this->appConfig['contenttypes'][$contentType])) {
+            if (!isset($this->appConfig->get('contenttypes')[$contentType])) {
                 return false;
             }
 
-            if (!isset($this->appConfig['contenttypes'][$contentType]['taxonomy'])) {
+            if (!isset($this->appConfig->get('contenttypes')[$contentType]['taxonomy'])) {
                 return false;
             }
 
             // Get first available taxonomy that behaves like tags
             // TODO: Research, what if content type has several taxonomies which behave like tags? Is it possible?
             $tagsTaxonomy = null;
-            foreach ($this->appConfig['contenttypes'][$contentType]['taxonomy'] as $taxonomy) {
-                if ('tags' == $this->appConfig['taxonomy'][$taxonomy]['behaves_like']) {
+            foreach ($this->appConfig->get('contenttypes')[$contentType]['taxonomy'] as $taxonomy) {
+                if ('tags' == $this->appConfig->get('taxonomy')[$taxonomy]['behaves_like']) {
                     $tagsTaxonomy = $taxonomy;
                     break;
                 }
