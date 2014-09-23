@@ -23,12 +23,12 @@ namespace TagCloud
                 'keywords' => "bolt, extension, tagcloud",
                 'author' => "Aleksey Orlov",
                 'link' => "https://github.com/axsy/bolt-extension-tagcloud",
-                'version' => "0.1",
+                'version' => "1.0",
                 'required_bolt_version' => "1.0.3",
-                'highest_bolt_version' => "1.1.4",
+                'highest_bolt_version' => "1.6.10",
                 'type' => "General",
                 'first_releasedate' => "2013-03-27",
-                'latest_releasedate' => "2013-08-19",
+                'latest_releasedate' => "2014-09-23",
                 'dependencies' => "",
                 'priority' => 10
             );
@@ -209,11 +209,14 @@ namespace TagCloud\Engine
                 ->addSelect('COUNT(bt.id) AS count')
                 ->from('bolt_taxonomy', 'bt')
                 ->groupBy('bt.slug')
+                ->innerJoin('bt', 'bolt_entries', 'be', 'be.id = bt.content_id')
                 ->where('bt.taxonomytype = :taxonomyType')
                 ->andWhere('bt.contenttype = :contentType')
+                ->andWhere('be.status = :entryStatus')
                 ->setParameters(array(
                     ':taxonomyType' => $taxonomyType,
-                    ':contentType' => $contentType
+                    ':contentType' => $contentType,
+                    ':entryStatus' => 'published'
                 ))
                 ->setMaxResults($cloudSize)
                 ->execute();
